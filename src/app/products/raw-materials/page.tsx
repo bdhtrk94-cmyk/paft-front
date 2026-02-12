@@ -1,0 +1,800 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+
+/* ─── Data ─── */
+interface MaterialCard {
+    id: string;
+    title: string;
+    image: string;
+    polymer: string;
+    source: string;
+    color: string;
+    additives: string;
+    link: string;
+}
+
+interface DataSheet {
+    id: string;
+    title: string;
+    subtitle: string;
+    badges: string[];
+    description: string;
+    datasheetUrl: string;
+    pdfUrl: string;
+}
+
+const materials: MaterialCard[] = [
+    {
+        id: 'regular-grade',
+        title: 'Recycled HDPE - Regular Grade',
+        image: 'https://paft.eg/wp-content/uploads/2025/10/picture.png',
+        polymer: 'Recycled high-density polyethylene',
+        source: 'Bottles, containers, industrial scrap',
+        color: 'White, black or colored',
+        additives: 'Stabilizers, pigments, antioxidants',
+        link: 'https://paft.eg/mat1',
+    },
+    {
+        id: 'medium-flow',
+        title: 'Recycled HDPE - Medium Flow Rate',
+        image: 'https://paft.eg/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-08-at-3.14.00-PM.jpeg',
+        polymer: 'Recycled high-density polyethylene',
+        source: 'Bottles, containers, industrial scrap',
+        color: 'White, black or colored',
+        additives: 'Stabilizers, pigments, antioxidants',
+        link: 'https://paft.eg/mat4',
+    },
+    {
+        id: 'high-flow',
+        title: 'Recycled HDPE - High Flow Rate',
+        image: 'https://paft.eg/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-08-at-3.13.59-PM.jpeg',
+        polymer: 'Recycled high-density polyethylene',
+        source: 'Bottles, containers, industrial scrap',
+        color: 'White, black or colored',
+        additives: 'Stabilizers, pigments, antioxidants',
+        link: 'https://paft.eg/mat5',
+    },
+    {
+        id: 'high-perf',
+        title: 'Recycled HDPE - High Performance',
+        image: 'https://paft.eg/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-08-at-3.14.00-PM-1.jpeg',
+        polymer: 'Recycled high-density polyethylene',
+        source: 'Bottles, containers, industrial scrap',
+        color: 'White, black or colored',
+        additives: 'Stabilizers, pigments, antioxidants',
+        link: 'https://paft.eg/mat3',
+    },
+    {
+        id: 'mid-perf',
+        title: 'Recycled HDPE - Mid Performance',
+        image: 'https://paft.eg/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-08-at-3.14.01-PM.jpeg',
+        polymer: 'Recycled high-density polyethylene',
+        source: 'Bottles, containers, industrial scrap',
+        color: 'White, black or colored',
+        additives: 'Stabilizers, pigments, antioxidants',
+        link: 'https://paft.eg/mat2',
+    },
+];
+
+const dataSheets: DataSheet[] = [
+    {
+        id: 'ds-regular',
+        title: 'Recycled HDPE - Regular Grade',
+        subtitle: 'Standard Performance',
+        badges: ['Injection Molding', 'High Stiffness', 'Recyclable'],
+        description:
+            'Recycled HDPE - Regular Grade offers reliable standard performance for general-purpose applications. This recycled high-density polyethylene provides good mechanical properties, chemical resistance, and processability at an economical price point. Suitable for a wide range of injection molding applications including crates, boxes, containers, household items, and industrial parts where standard performance characteristics are required.',
+        datasheetUrl: 'https://paft.eg/mat1',
+        pdfUrl:
+            'https://paft.eg/wp-content/uploads/2025/10/Materials-Datasheet-r-HDPE-Reqular-mat-1-003.pdf',
+    },
+    {
+        id: 'ds-mid',
+        title: 'Recycled HDPE - Mid Performance',
+        subtitle: 'Enhanced Impact',
+        badges: ['Blow Molding', 'ESCR Resistant', '100% Recyclable'],
+        description:
+            'Recycled HDPE - Mid Performance is a mid-performance grade offering enhanced impact resistance and improved mechanical properties compared to regular grade. This balanced formulation combines good stiffness with superior toughness, making it suitable for demanding applications. Enhanced impact strength ensures reliability even under stress, perfect for industrial containers, transport packaging, technical parts, and applications requiring durability in challenging environments.',
+        datasheetUrl: 'https://paft.eg/mat2',
+        pdfUrl:
+            'https://paft.eg/wp-content/uploads/2025/10/Materials-Datasheet-r-HDPE-Mid.-Perf.-mat-2-004.pdf',
+    },
+    {
+        id: 'ds-high',
+        title: 'Recycled HDPE - High Performance',
+        subtitle: 'Maximum Toughness',
+        badges: ['Pressure Pipes', 'Long-Term Durability', 'UV Stabilized'],
+        description:
+            'Recycled HDPE - High Performance delivers maximum toughness and is the highest performance grade in our recycled HDPE portfolio. This premium grade offers exceptional mechanical properties, superior stress crack resistance, and outstanding durability for the most demanding applications. Ideal for heavy-duty industrial components, high-stress structural parts, large containers, and critical applications where maximum material performance and long-term reliability are essential.',
+        datasheetUrl: 'https://paft.eg/mat3',
+        pdfUrl:
+            'https://paft.eg/wp-content/uploads/2025/10/Materials-Datasheet-r-HDPE-HI.-Perf.-mat-3-copy.pdf',
+    },
+    {
+        id: 'ds-med-flow',
+        title: 'Recycled HDPE - Medium Flow Rate',
+        subtitle: 'Balanced Processing',
+        badges: ['General Purpose', 'Excellent Finish', 'Recyclable'],
+        description:
+            'Recycled HDPE - Medium Flow Rate features balanced processing characteristics for injection molding and extrusion applications. This grade offers excellent flow properties while maintaining good mechanical strength and dimensional stability. The medium flow rate enables efficient filling of molds with moderate complexity, making it ideal for containers, caps, closures, and technical parts requiring a balance between processability and performance.',
+        datasheetUrl: 'https://paft.eg/mat4',
+        pdfUrl:
+            'https://paft.eg/wp-content/uploads/2025/10/Materials-Datasheet-r-HDPE-Mid.-MFR-mat-4-copy-002.pdf',
+    },
+    {
+        id: 'ds-high-flow',
+        title: 'Recycled HDPE - High Flow Rate',
+        subtitle: 'Fast Cycle Times',
+        badges: ['Thin-Wall Molding', 'High Output', 'UV Stabilized'],
+        description:
+            'Recycled HDPE - High Flow Rate is engineered for fast cycle time applications and thin-wall molding. This free-flowing material offers excellent processability with rapid mold filling and short cooling times, significantly improving production efficiency. Ideal for high-volume manufacturing of thin-wall containers, packaging components, closures, and applications where fast processing and high output are critical. Perfect for maximizing productivity while maintaining consistent quality.',
+        datasheetUrl: 'https://paft.eg/mat5',
+        pdfUrl:
+            'https://paft.eg/wp-content/uploads/2025/10/Materials-Datasheet-r-HDPE-HI.-MFR-mat-5-copy.pdf',
+    },
+];
+
+/* ─── Scroll Animation Hook ─── */
+function useInView(threshold = 0.15) {
+    const ref = useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = useState(false);
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(
+            ([e]) => {
+                if (e.isIntersecting) {
+                    setVisible(true);
+                    obs.unobserve(e.target);
+                }
+            },
+            { threshold, rootMargin: '0px 0px -40px 0px' }
+        );
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, [threshold]);
+    return { ref, visible };
+}
+
+/* ─── Material Card Component ─── */
+function MaterialCardComponent({
+    material,
+    index,
+}: {
+    material: MaterialCard;
+    index: number;
+}) {
+    const { ref, visible } = useInView(0.1);
+    const [hovered, setHovered] = useState(false);
+    const accents = ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B', '#EC4899'];
+    const accent = accents[index % accents.length];
+
+    return (
+        <div
+            ref={ref}
+            className="relative group"
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(40px)',
+                transition: `all 0.7s cubic-bezier(0.16,1,0.3,1) ${index * 0.1}s`,
+            }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+        >
+            <div
+                className="rounded-2xl overflow-hidden h-full flex flex-col"
+                style={{
+                    background: 'rgba(30, 41, 59, 0.5)',
+                    backdropFilter: 'blur(16px)',
+                    border: `1px solid ${hovered ? accent + '50' : 'rgba(255,255,255,0.06)'}`,
+                    boxShadow: hovered
+                        ? `0 25px 60px rgba(0,0,0,0.35), 0 0 30px ${accent}10`
+                        : '0 4px 20px rgba(0,0,0,0.12)',
+                    transform: hovered ? 'translateY(-10px) scale(1.02)' : 'translateY(0) scale(1)',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+            >
+                {/* Image */}
+                <div className="relative overflow-hidden" style={{ height: '320px' }}>
+                    <img
+                        src={material.image}
+                        alt={material.title}
+                        className="w-full h-full object-cover transition-transform duration-700"
+                        style={{ transform: hovered ? 'scale(1.12)' : 'scale(1)' }}
+                        loading="lazy"
+                    />
+                    {/* Gradient overlay */}
+                    <div
+                        className="absolute inset-0 transition-opacity duration-300"
+                        style={{
+                            background: `linear-gradient(to top, rgba(11,17,33,0.9) 0%, rgba(11,17,33,0.2) 50%, transparent 100%)`,
+                            opacity: hovered ? 1 : 0.7,
+                        }}
+                    />
+                    {/* Overlay button */}
+                    <div
+                        className="absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+                        style={{ opacity: hovered ? 1 : 0 }}
+                    >
+                        <a
+                            href={material.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105"
+                            style={{
+                                background: 'rgba(255,255,255,0.95)',
+                                color: '#0f172a',
+                                boxShadow: '0 8px 25px rgba(0,0,0,0.3)',
+                                transform: hovered ? 'translateY(0)' : 'translateY(15px)',
+                                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                            }}
+                        >
+                            Learn More →
+                        </a>
+                    </div>
+                    {/* Top accent bar */}
+                    <div
+                        className="absolute top-0 left-0 right-0 h-1"
+                        style={{ background: `linear-gradient(90deg, ${accent}, ${accent}80)` }}
+                    />
+                </div>
+
+                {/* Content */}
+                <div className="p-7 flex-1 flex flex-col">
+                    <h3
+                        className="text-xl font-bold mb-4"
+                        style={{ color: '#fff', letterSpacing: '-0.01em' }}
+                    >
+                        {material.title}
+                    </h3>
+                    <div className="space-y-3 text-sm flex-1">
+                        {[
+                            { label: 'Polymer', value: material.polymer },
+                            { label: 'Source', value: material.source },
+                            { label: 'Color', value: material.color },
+                            { label: 'Additives', value: material.additives },
+                        ].map((item) => (
+                            <div key={item.label} className="flex gap-2">
+                                <span className="font-semibold flex-shrink-0" style={{ color: accent }}>
+                                    {item.label}:
+                                </span>
+                                <span style={{ color: 'rgba(255,255,255,0.6)' }}>{item.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ─── Accordion Item ─── */
+function AccordionItem({
+    sheet,
+    index,
+    isOpen,
+    onToggle,
+}: {
+    sheet: DataSheet;
+    index: number;
+    isOpen: boolean;
+    onToggle: () => void;
+}) {
+    const { ref, visible } = useInView(0.1);
+    const accents = ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B', '#EC4899'];
+    const accent = accents[index % accents.length];
+
+    return (
+        <div
+            ref={ref}
+            className="rounded-xl overflow-hidden"
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(20px)',
+                transition: `all 0.6s ease ${index * 0.08}s`,
+                border: isOpen
+                    ? `1px solid ${accent}40`
+                    : '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(30, 41, 59, 0.3)',
+                backdropFilter: 'blur(10px)',
+            }}
+        >
+            {/* Header */}
+            <button
+                onClick={onToggle}
+                className="w-full flex items-center justify-between px-6 py-5 transition-all duration-300 text-left"
+                style={{
+                    background: isOpen
+                        ? `linear-gradient(135deg, ${accent}15, ${accent}08)`
+                        : 'transparent',
+                }}
+            >
+                <div className="flex items-center gap-4">
+                    <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{
+                            background: `${accent}15`,
+                            border: `1px solid ${accent}25`,
+                        }}
+                    >
+                        <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke={accent}
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold" style={{ color: '#fff' }}>
+                            {sheet.title}
+                        </h3>
+                        <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                            {sheet.subtitle}
+                        </p>
+                    </div>
+                </div>
+                <svg
+                    className="w-5 h-5 flex-shrink-0 transition-transform duration-300"
+                    style={{
+                        color: accent,
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                    />
+                </svg>
+            </button>
+
+            {/* Content */}
+            <div
+                className="transition-all duration-500 ease-in-out overflow-hidden"
+                style={{
+                    maxHeight: isOpen ? '600px' : '0px',
+                    opacity: isOpen ? 1 : 0,
+                }}
+            >
+                <div
+                    className="px-6 pb-6 pt-2"
+                    style={{ borderTop: `1px solid ${accent}15` }}
+                >
+                    {/* Badges */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {sheet.badges.map((badge) => (
+                            <span
+                                key={badge}
+                                className="px-3 py-1 rounded-full text-xs font-semibold"
+                                style={{
+                                    background: `${accent}12`,
+                                    color: accent,
+                                    border: `1px solid ${accent}20`,
+                                }}
+                            >
+                                {badge}
+                            </span>
+                        ))}
+                    </div>
+
+                    {/* Description */}
+                    <p
+                        className="text-sm leading-relaxed mb-5"
+                        style={{ color: 'rgba(255,255,255,0.6)', lineHeight: '1.8' }}
+                    >
+                        {sheet.description}
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-3">
+                        <a
+                            href={sheet.datasheetUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:-translate-y-0.5"
+                            style={{
+                                background: `linear-gradient(135deg, ${accent}, ${accent}CC)`,
+                                color: '#fff',
+                                boxShadow: `0 4px 15px ${accent}30`,
+                            }}
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                            </svg>
+                            Open Datasheet
+                        </a>
+                        <a
+                            href={sheet.pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/5"
+                            style={{
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                color: 'rgba(255,255,255,0.8)',
+                            }}
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                />
+                            </svg>
+                            Download PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ─── Main Page ─── */
+export default function RawMaterialSupply() {
+    const { ref: heroRef, visible: heroVisible } = useInView(0.1);
+    const { ref: cardsRef, visible: cardsVisible } = useInView(0.05);
+    const { ref: sheetsRef, visible: sheetsVisible } = useInView(0.05);
+    const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+
+    return (
+        <div className="min-h-screen" style={{ background: '#0B1121' }}>
+            <Header currentPage="raw-materials" />
+
+            {/* ── Hero Section ── */}
+            <section
+                ref={heroRef}
+                className="relative overflow-hidden"
+                style={{ minHeight: '70vh', display: 'flex', alignItems: 'center' }}
+            >
+                {/* Background image */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        backgroundImage:
+                            'url(https://images.unsplash.com/photo-1665399320077-e1c70b4a0995?fm=jpg&q=60&w=3000&auto=format&fit=crop)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                    }}
+                />
+                {/* Dark overlay */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background:
+                            'linear-gradient(135deg, rgba(11,17,33,0.90) 0%, rgba(15,23,42,0.82) 50%, rgba(11,17,33,0.92) 100%)',
+                    }}
+                />
+                {/* Decorative blurs */}
+                <div
+                    className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-12"
+                    style={{
+                        background: 'radial-gradient(circle, #10B981, transparent 70%)',
+                        filter: 'blur(100px)',
+                        transform: 'translate(30%, -30%)',
+                    }}
+                />
+                <div
+                    className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-10"
+                    style={{
+                        background: 'radial-gradient(circle, #06B6D4, transparent 70%)',
+                        filter: 'blur(100px)',
+                        transform: 'translate(-30%, 30%)',
+                    }}
+                />
+
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-24">
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        {/* Text content */}
+                        <div>
+                            {/* Badge */}
+                            <div
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
+                                style={{
+                                    background: 'rgba(16, 185, 129, 0.1)',
+                                    border: '1px solid rgba(16, 185, 129, 0.2)',
+                                    backdropFilter: 'blur(10px)',
+                                    opacity: heroVisible ? 1 : 0,
+                                    transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
+                                    transition: 'all 0.7s ease',
+                                }}
+                            >
+                                <span
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ background: '#10B981', boxShadow: '0 0 8px #10B981' }}
+                                />
+                                <span
+                                    className="text-sm font-semibold tracking-wider uppercase"
+                                    style={{ color: 'rgba(255,255,255,0.9)' }}
+                                >
+                                    Raw Material Supply
+                                </span>
+                            </div>
+
+                            <h1
+                                className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
+                                style={{
+                                    letterSpacing: '-0.04em',
+                                    opacity: heroVisible ? 1 : 0,
+                                    transform: heroVisible ? 'translateY(0)' : 'translateY(30px)',
+                                    transition: 'all 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s',
+                                }}
+                            >
+                                <span style={{ color: '#fff' }}>Sustainable</span>
+                                <br />
+                                <span
+                                    style={{
+                                        background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                    }}
+                                >
+                                    Materials
+                                </span>
+                            </h1>
+
+                            <p
+                                className="text-lg md:text-xl leading-relaxed"
+                                style={{
+                                    color: 'rgba(255,255,255,0.65)',
+                                    opacity: heroVisible ? 1 : 0,
+                                    transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
+                                    transition: 'all 0.8s ease 0.25s',
+                                    lineHeight: '1.9',
+                                }}
+                            >
+                                Our commitment to sustainability drives innovation in polymer
+                                technology. We develop advanced materials that minimize
+                                environmental impact while delivering superior performance.
+                                Explore our eco-conscious product portfolio designed for a greener
+                                future.
+                            </p>
+                        </div>
+
+                        {/* Stats panel */}
+                        <div
+                            className="grid grid-cols-2 gap-4"
+                            style={{
+                                opacity: heroVisible ? 1 : 0,
+                                transform: heroVisible ? 'translateY(0)' : 'translateY(30px)',
+                                transition: 'all 0.9s ease 0.35s',
+                            }}
+                        >
+                            {[
+                                {
+                                    value: '5', label: 'Material Grades',
+                                    icon: (
+                                        <svg className="w-6 h-6" fill="none" stroke="url(#grad)" viewBox="0 0 24 24">
+                                            <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#10B981" /><stop offset="100%" stopColor="#06B6D4" /></linearGradient></defs>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                        </svg>
+                                    ),
+                                },
+                                {
+                                    value: '100%', label: 'Recyclable',
+                                    icon: (
+                                        <svg className="w-6 h-6" fill="none" stroke="url(#grad)" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    ),
+                                },
+                                {
+                                    value: 'HDPE', label: 'Polymer Base',
+                                    icon: (
+                                        <svg className="w-6 h-6" fill="none" stroke="url(#grad)" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    ),
+                                },
+                                {
+                                    value: 'ISO', label: 'Certified',
+                                    icon: (
+                                        <svg className="w-6 h-6" fill="none" stroke="url(#grad)" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                        </svg>
+                                    ),
+                                },
+                            ].map((stat, i) => (
+                                <div
+                                    key={i}
+                                    className="rounded-xl p-5 text-center"
+                                    style={{
+                                        backgroundColor: 'rgba(255,255,255,0.04)',
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                        backdropFilter: 'blur(10px)',
+                                    }}
+                                >
+                                    <div className="flex justify-center mb-3">
+                                        <div
+                                            className="w-12 h-12 rounded-full flex items-center justify-center"
+                                            style={{
+                                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                            }}
+                                        >
+                                            {stat.icon}
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="text-2xl font-bold"
+                                        style={{
+                                            background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent',
+                                        }}
+                                    >
+                                        {stat.value}
+                                    </div>
+                                    <div
+                                        className="text-xs mt-1 uppercase tracking-wider font-medium"
+                                        style={{ color: 'rgba(255,255,255,0.45)' }}
+                                    >
+                                        {stat.label}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Materials Grid ── */}
+            <section ref={cardsRef} className="py-16 lg:py-24" style={{ background: '#0f1729' }}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Section heading */}
+                    <div
+                        className="text-center mb-14"
+                        style={{
+                            opacity: cardsVisible ? 1 : 0,
+                            transform: cardsVisible ? 'translateY(0)' : 'translateY(20px)',
+                            transition: 'all 0.7s ease',
+                        }}
+                    >
+                        <h2 className="text-3xl lg:text-4xl font-bold mb-3" style={{ color: '#fff' }}>
+                            Our{' '}
+                            <span
+                                style={{
+                                    background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                }}
+                            >
+                                Materials
+                            </span>
+                        </h2>
+                        <p className="text-base" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                            Discover our range of sustainable polymer solutions
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {materials.map((mat, i) => (
+                            <MaterialCardComponent key={mat.id} material={mat} index={i} />
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Product Data Sheets ── */}
+            <section ref={sheetsRef} className="py-16 lg:py-24">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Section heading */}
+                    <div
+                        className="text-center mb-12"
+                        style={{
+                            opacity: sheetsVisible ? 1 : 0,
+                            transform: sheetsVisible ? 'translateY(0)' : 'translateY(20px)',
+                            transition: 'all 0.7s ease',
+                        }}
+                    >
+                        <h2 className="text-3xl lg:text-4xl font-bold mb-3" style={{ color: '#fff' }}>
+                            Product{' '}
+                            <span
+                                style={{
+                                    background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                }}
+                            >
+                                Data Sheets
+                            </span>
+                        </h2>
+                        <p className="text-base" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                            Explore our comprehensive range of sustainable polymer materials
+                        </p>
+                    </div>
+
+                    <div className="space-y-3">
+                        {dataSheets.map((sheet, i) => (
+                            <AccordionItem
+                                key={sheet.id}
+                                sheet={sheet}
+                                index={i}
+                                isOpen={openAccordion === sheet.id}
+                                onToggle={() =>
+                                    setOpenAccordion(openAccordion === sheet.id ? null : sheet.id)
+                                }
+                            />
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── CTA Section ── */}
+            <section className="py-20 relative overflow-hidden">
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background:
+                            'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08))',
+                    }}
+                />
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                    <h2
+                        className="text-4xl lg:text-5xl font-bold mb-6"
+                        style={{ color: '#fff' }}
+                    >
+                        Ready to go{' '}
+                        <span
+                            style={{
+                                background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                            }}
+                        >
+                            Sustainable?
+                        </span>
+                    </h2>
+                    <p className="text-xl mb-10" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        Let us help you transition to high-grade recycled materials without
+                        compromising on quality
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-4">
+                        <a
+                            href="/contact"
+                            className="px-8 py-4 rounded-xl font-semibold text-lg text-white transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                            style={{
+                                background: 'linear-gradient(135deg, #10B981, #06B6D4)',
+                                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
+                            }}
+                        >
+                            Request a Sample →
+                        </a>
+                        <a
+                            href="/contact"
+                            className="px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:bg-white/5"
+                            style={{
+                                border: '2px solid rgba(255,255,255,0.2)',
+                                color: 'rgba(255,255,255,0.8)',
+                            }}
+                        >
+                            Contact Sales
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <Footer />
+        </div>
+    );
+}
