@@ -28,8 +28,8 @@ PAFT specializes in durable, eco-friendly, and cost-effective logistics solution
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/Tarqumi/PAFT_System.git
-cd PAFT_System
+git clone https://github.com/bdhtrk94-cmyk/paft-front.git
+cd paft-front
 ```
 
 2. **Install dependencies**
